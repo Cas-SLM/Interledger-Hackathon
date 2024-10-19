@@ -6,7 +6,7 @@ import { createAuthenticatedClient } from "@interledger/open-payments";
     // creating the authentication
     const client = await createAuthenticatedClient({
         walletAddressUrl: "https://ilp.interledger-test.dev/30b77282", // the wallet address of the client that is making the payment
-        privateKey: "../keys/squad_deep.key", // used for the signing of the data, I provided the path of the key
+        privateKey: "private.key", // used for the signing of the data, I provided the path of the key
         keyID: "31a3df0b-6833-4d39-9db2-0ee9d6a5a7a8", // the id that the key belongs too
     });
 
