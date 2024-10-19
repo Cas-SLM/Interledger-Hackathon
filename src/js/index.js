@@ -1,2 +1,35 @@
 // open pay client
-import {createAuthenticatedClient} from "@interledger/open-payments"
+import { createAuthenticatedClient } from "@interledger/open-payments";
+
+(async () => {
+
+    // creating the authentication
+    const client = await createAuthenticatedClient({
+        walletAddressUrl: "https://ilp.interledger-test.dev/30b77282", // the wallet address of the client that is making the payment
+        privateKey: "../keys/squad_deep.key", // used for the signing of the data, I provided the path of the key
+        keyID: "31a3df0b-6833-4d39-9db2-0ee9d6a5a7a8", // the id that the key belongs too
+    });
+
+
+    const receivingWalletAddress = await client.receivingWalletAddress.get(
+        url = "https://ilp.interledger-test.dev/cas-transactions", // the url of who we sending the money too
+        /*
+        requesting just the receiving wallets url will return:
+        publicName = account holders name
+        assetCode = account currency
+        assetScale = decimal point, default = 2, this 1000 would be 10.00 usd if scale is 3 then it would be 1.000 usd
+        authServer = the as server we need to send the grant to
+        resourceServer = the rs server to send the resources to
+        */
+    )
+
+    const sendingWalletAddress = await client.sendingWalletAddress.get(
+        url = "https://ilp.interledger-test.dev/30b77282", /* getting the name, assetCode,
+        rs and as of the wallet that we sending with */
+    )
+
+    console.log(receivingWalletAddress);
+
+    // 1. getting the grant from incoming payment
+
+})();
