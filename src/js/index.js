@@ -12,20 +12,24 @@ import { createAuthenticatedClient } from "@interledger/open-payments";
 
 
     const receivingWalletAddress = await client.receivingWalletAddress.get(
-        url = "https://ilp.interledger-test.dev/cas-transactions", // the url of who we sending the money too
-        /*
-        requesting just the receiving wallets url will return:
-        publicName = account holders name
-        assetCode = account currency
-        assetScale = decimal point, default = 2, this 1000 would be 10.00 usd if scale is 3 then it would be 1.000 usd
-        authServer = the as server we need to send the grant to
-        resourceServer = the rs server to send the resources to
-        */
+      {
+          url: 'https://ilp.interledger-test.dev/cas-transactions' // the url of who we sending the money too
+          /*
+          requesting just the receiving wallets url will return:
+          publicName = account holders name
+          assetCode = account currency
+          assetScale = decimal point, default = 2, this 1000 would be 10.00 usd if scale is 3 then it would be 1.000 usd
+          authServer = the as server we need to send the grant to
+          resourceServer = the rs server to send the resources to
+          */
+      }
     )
 
     const sendingWalletAddress = await client.sendingWalletAddress.get(
-        url = "https://ilp.interledger-test.dev/30b77282", /* getting the name, assetCode,
+      {
+          url: 'https://ilp.interledger-test.dev/30b77282' /* getting the name, assetCode,
         rs and as of the wallet that we sending with */
+      }
     )
 
     console.log(receivingWalletAddress);
@@ -74,15 +78,14 @@ import { createAuthenticatedClient } from "@interledger/open-payments";
 
     // 3. getting grant for incoming quote, this happens on the senders side
     const quoteGrant = await client.grant.request(
-        { url: sendingWalletAddress.authServer}, the // auth of the sender
+        { url: sendingWalletAddress.authServer},// the auth of the sender
         {
             access_token: {
-                [
-                    {
-                        type: "quote", // because we requesting the sender that we want to quote them
-
-                    }
-                ]
+                access: [{
+                      type: 'quote', // because we requesting the sender that we want to quote them
+                      actions: ["create"],
+                  }]
+            }
         }
     )
 
