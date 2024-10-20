@@ -1,0 +1,71 @@
+---
+const { hasBorder = true } = Astro.props;
+---
+<div>
+  {hasBorder ? 
+    <div class="not-content border mermaid-wrapper"><slot /></div> : 
+    <div class="not-content"><slot /></div>
+  }
+  <button data-mermaid-button class="button">
+    <span>View full diagram</span>
+  </button>
+</div>
+
+<style>
+div {
+  margin-top: var(--space-m);
+}
+
+
+.border :global(svg) {
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  border: 2px solid var(--color-accent-transparent);
+  padding: var(--space-2xs);
+}
+
+button {
+  background-color: initial;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+.button[data-mermaid-button].button[data-mermaid-button] {
+  margin-top: 0;
+}
+
+span {
+  white-space: nowrap;
+  display: inline-flex;
+  gap: var(--space-3xs);
+  color: var(--sl-color-text-accent);
+  text-decoration: underline;
+}
+
+button:hover span {
+  color: var(--sl-color-white);
+}
+
+span::after {
+  content: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 18"><path stroke="hsl(221,8%,56%)" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 3H3a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4M11 1h6m0 0v6m0-6L7 11"/></svg>');
+  height: 0.75em;
+  width: 0.75em;
+}
+</style>
+
+<script>
+  const clickHandler = event => {
+    const svg = event.target.parentElement.previousElementSibling.querySelector('svg')
+    const as_text = new XMLSerializer().serializeToString(svg)
+    const blob = new Blob([as_text], { type: 'image/svg+xml' })
+    const url = URL.createObjectURL(blob)
+    const win = open(url)
+    win.onload = (evt) => URL.revokeObjectURL(url)
+  }
+
+  const buttons = document.querySelectorAll('[data-mermaid-button]');
+  buttons.forEach((button) => {
+    button.addEventListener('click', clickHandler);
+  });
+</script>

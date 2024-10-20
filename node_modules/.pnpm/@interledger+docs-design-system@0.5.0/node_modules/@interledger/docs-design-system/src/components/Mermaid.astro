@@ -1,0 +1,29 @@
+---
+interface Props {
+  graph: string;
+}
+
+const { graph, hasBorder = false } = Astro.props;
+---
+
+{hasBorder ? <pre class="mermaid border" set:html={graph} /> : <pre class="mermaid" set:html={graph} />}
+
+
+<style>
+  pre.mermaid.mermaid {
+    background-color: transparent;
+    padding: 0;
+    border-color: transparent;
+  }
+
+  pre.border {
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    border: 2px solid var(--color-accent-transparent);
+  }
+</style>
+
+<script>
+  import mermaid from "/node_modules/mermaid/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: true });
+</script>

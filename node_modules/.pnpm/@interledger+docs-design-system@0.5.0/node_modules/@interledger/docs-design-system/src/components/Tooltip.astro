@@ -1,0 +1,178 @@
+---
+const { content } = Astro.props;
+const uuid = crypto.randomUUID();
+---
+<span data-tooltip-wrapper class="wrapper">
+  <slot />
+  <button
+    data-tooltip-button
+    type='button'
+    aria-label="Definition"
+    aria-expanded="false"
+    aria-labelledby={uuid}
+  >
+    ?
+  </button>
+  <span data-tooltip-bubble role='tooltip' id={uuid} class="bubble">{content}</span>
+</span>
+
+<style>
+.wrapper {
+  position: relative;
+  display: inline-block;
+  margin-right: 8px;
+}
+
+button {
+  background-color: transparent;
+  border: 0;
+  padding: 0 var(--space-3xs);
+  font-size: 12px;
+  font-weight: bold;
+  text-decoration: underline dotted;
+  position: absolute;
+  bottom: 10px;
+  right: -12px;
+  cursor: pointer;
+  user-select: none;
+  text-decoration: underline dotted;
+  text-underline-offset: 2px;
+}
+
+.bubble {
+  position: absolute;
+  right: 0;
+  bottom: 100%;
+  background-color: var(--sl-color-bg-nav);
+  border: 1px solid var(--sl-color-hairline-light);
+  padding: var(--space-2xs);
+  border-radius: var(--border-radius);
+  line-height: 1.25;
+  width: 16em;
+}
+
+button[aria-expanded="false"] + .bubble {
+  visibility: hidden;
+}
+
+button[aria-expanded="true"] + .bubble {
+  visibility: visible;
+}
+
+.shifted {
+  left: 0;
+}
+
+.wrapperAdjust {
+  position: initial;
+}
+
+.bubbleAdjust {
+  left: 0;
+  bottom: initial;
+}
+
+.btnAdjust {
+  right: initial;
+  bottom: initial;
+}
+</style>
+
+<script>
+const tooltips = document.querySelectorAll('[data-tooltip-wrapper]');
+tooltips.forEach((tooltip) => {
+  tooltip.addEventListener('mouseover', function() {
+    const button = this.querySelector('button')
+    button.setAttribute('aria-expanded', 'true');
+    const bubble = this.querySelector('.bubble')
+    positionCheck(bubble)
+  });
+
+  tooltip.addEventListener('mouseleave', function() {
+    const button = this.querySelector('button')
+    button.setAttribute('aria-expanded', 'false');
+  });
+});
+
+const buttons = document.querySelectorAll('[data-tooltip-button]');
+buttons.forEach((button) => {
+  button.addEventListener('click', function() {
+    if (this.getAttribute('aria-expanded') === 'true') {
+      this.setAttribute('aria-expanded', 'false');
+    }
+    else {
+      this.setAttribute('aria-expanded', 'true');
+      const bubble = this.nextSibling;
+      positionCheck(bubble)
+    } 
+  });
+
+  button.addEventListener('blur', function() {
+    this.setAttribute('aria-expanded', 'false');
+  });
+
+  button.addEventListener('focus', function() {
+    this.setAttribute('aria-expanded', 'true');
+    const bubble = this.nextSibling;
+    positionCheck(bubble)
+  });
+
+  button.addEventListener('keydown', function(e) {
+    if ((e.keyCode || e.which) === 27) {
+      this.setAttribute('aria-expanded', 'false');
+    }
+  });
+});
+
+document.addEventListener('click', function (event) {
+  buttons.forEach((button) => {
+    if (event.target !== button) {
+      button.setAttribute('aria-expanded', 'false');
+    }
+  });                      
+});
+
+document.addEventListener('keydown', function (event) {
+  buttons.forEach((button) => {
+    if (event.key === 'Escape') {
+      button.setAttribute('aria-expanded', 'false');
+    }
+  });                      
+});
+
+const positionCheck = elem => {
+  const isDesktop = window.innerWidth > 799
+  const leftPos = elem.getBoundingClientRect().left;
+  const rightPos = elem.getBoundingClientRect().right + elem.offsetWidth;
+  const parent = elem.parentElement;
+
+  if (leftPos < 0 && rightPos > window.innerWidth) {
+    parent.className+= ' wrapperAdjust'
+    elem.className+= ' bubbleAdjust'
+    elem.style.top = `${parent.offsetTop - elem.offsetHeight}px`
+    elem.previousElementSibling.className+= ' btnAdjust'
+    elem.previousElementSibling.style.top = `${parent.offsetTop - 4}px`
+    elem.previousElementSibling.style.left = `${parent.offsetLeft + parent.offsetWidth - 3}px`
+  } else if (leftPos < 0) {
+    parent.classList.remove('wrapperAdjust')
+    elem.className+= ' shifted'
+    elem.style.top = ''
+    elem.previousElementSibling.style.top = ''
+    elem.previousElementSibling.style.left = ''
+  } else if (rightPos > window.innerWidth) {
+    parent.classList.remove('wrapperAdjust')
+    elem.classList.remove('bubbleAdjust', 'shifted')
+    elem.style.top = ''
+    elem.previousElementSibling.classList.remove('btnAdjust')
+    elem.previousElementSibling.style.top = ''
+    elem.previousElementSibling.style.left = ''
+  } else if (isDesktop) {
+    parent.classList.remove('wrapperAdjust')
+    elem.classList.remove('bubbleAdjust', 'shifted')
+    elem.style.top = ''
+    elem.previousElementSibling.classList.remove('btnAdjust')
+    elem.previousElementSibling.style.top = ''
+    elem.previousElementSibling.style.left = ''
+  }
+}
+</script>
